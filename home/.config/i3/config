@@ -177,6 +177,10 @@ bindsym XF86AudioMute exec --no-startup-id "amixer sset Master toggle | sed -En 
 
 bindsym $mod+Shift+p exec --no-startup-id gnome-calculator
 
+## Previous / next workspace
+bindsym $mod+Prior workspace prev
+bindsym $mod+Next workspace next
+
 ## Fn keys: brightness (shows the level on the xob bar)
 bindsym XF86MonBrightnessUp exec --no-startup-id sh -c "brightnessctl -q set 5%+ && brightnessctl -m | cut -d, -f4 | tr -d % > /tmp/xobpipe"
 bindsym XF86MonBrightnessDown exec --no-startup-id sh -c "brightnessctl -q set 5%- && brightnessctl -m | cut -d, -f4 | tr -d % > /tmp/xobpipe"
