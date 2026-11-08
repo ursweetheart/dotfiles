@@ -66,7 +66,7 @@ system_settings() {
             sudo tee -a /etc/environment >/dev/null
         echo "   added fcitx5 variables to /etc/environment"
     fi
-    # Public encrypted DNS (the ISP's DNS blocks Steam)
+    # Public encrypted DNS (the ISP's DNS blocks some sites)
     if ! cmp -s "$DOTFILES/system/resolved-dns.conf" /etc/systemd/resolved.conf.d/dns.conf; then
         sudo install -Dm644 "$DOTFILES/system/resolved-dns.conf" /etc/systemd/resolved.conf.d/dns.conf
         sudo systemctl restart systemd-resolved

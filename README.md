@@ -47,4 +47,4 @@ Change these on a different laptop:
 - `home/.config/polybar/config`: network interfaces `enp4s0` / `wlan0`, `thermal-zone = 5`, battery `BAT0`
 - `home/.config/polybar/scripts/wifi-menu.sh`: `wlan0`
 - `aur.txt`: `tuxedo-drivers-dkms` is only for Clevo-based laptops
-- Games run on the NVIDIA GPU with `prime-run` (Steam: `prime-run gamemoderun %command%`)
+- Run an app on the NVIDIA GPU with `prime-run <app>`. CUDA apps (PyTorch etc.) use it automatically.
