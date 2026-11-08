@@ -1,7 +1,0 @@
-// fastfetch (runs when a terminal opens). Same info as default, smaller logo.
-{
-  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-  "logo": {
-    "source": "CachyOS_small"
-  }
-}
