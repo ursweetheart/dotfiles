@@ -182,8 +182,8 @@ bindsym $mod+Prior workspace prev
 bindsym $mod+Next workspace next
 
 ## Fn keys: brightness (shows the level on the xob bar)
-bindsym XF86MonBrightnessUp exec --no-startup-id sh -c "brightnessctl -q set 5%+ && brightnessctl -m | cut -d, -f4 | tr -d % > /tmp/xobpipe"
-bindsym XF86MonBrightnessDown exec --no-startup-id sh -c "brightnessctl -q set 5%- && brightnessctl -m | cut -d, -f4 | tr -d % > /tmp/xobpipe"
+bindsym XF86MonBrightnessUp exec --no-startup-id ~/.config/i3/scripts/brightness.sh up
+bindsym XF86MonBrightnessDown exec --no-startup-id ~/.config/i3/scripts/brightness.sh down
 ## Fn keys: keyboard backlight (needs tuxedo-drivers on this laptop)
 bindsym XF86KbdBrightnessUp exec --no-startup-id sh -c 'brightnessctl -d "*kbd_backlight*" set 25%+'
 bindsym XF86KbdBrightnessDown exec --no-startup-id sh -c 'brightnessctl -d "*kbd_backlight*" set 25%-'
