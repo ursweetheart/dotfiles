@@ -52,7 +52,6 @@ lib32-gamemode
 
 # File manager
 thunar
-thunar-volman
 gvfs
 tumbler
 
