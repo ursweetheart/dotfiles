@@ -65,6 +65,12 @@ system_settings() {
             sudo tee -a /etc/environment >/dev/null
         echo "   added fcitx5 variables to /etc/environment"
     fi
+    # Public encrypted DNS (the ISP's DNS blocks Steam)
+    if ! cmp -s "$DOTFILES/system/resolved-dns.conf" /etc/systemd/resolved.conf.d/dns.conf; then
+        sudo install -Dm644 "$DOTFILES/system/resolved-dns.conf" /etc/systemd/resolved.conf.d/dns.conf
+        sudo systemctl restart systemd-resolved
+        echo "   set DNS to Cloudflare/Google over TLS"
+    fi
     # NVIDIA sleep/wake support
     if command -v nvidia-smi >/dev/null; then
         sudo systemctl enable nvidia-suspend nvidia-resume nvidia-hibernate
