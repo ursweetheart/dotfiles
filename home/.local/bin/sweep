@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# sweep: clean up junk on this machine.
+#
+#   sweep        show each kind of junk and its size, ask before cleaning it
+#   sweep -n     only show what could be cleaned (changes nothing)
+#   sweep -y     clean everything without asking
+#
+# Never touches: installed apps you use, your files, configs in ~/dotfiles,
+# or snapper snapshots (use btrfs-assistant for those).
+set -uo pipefail
+
+DRY=0; YES=0
+case "${1:-}" in
+    -n|--dry-run) DRY=1 ;;
+    -y|--yes)     YES=1 ;;
+    "")           ;;
+    *) sed -n '2,8s/^# \{0,1\}//p' "$0"; exit 1 ;;
+esac
+
+b=$'\033[1m'; dim=$'\033[2m'; grn=$'\033[32m'; rst=$'\033[0m'
+freed=0   # KiB
+
+human() { numfmt --to=iec --suffix=B $(( $1 * 1024 )) 2>/dev/null || echo "$1 KiB"; }
+size_of() { du -sk "$@" 2>/dev/null | awk '{s+=$1} END{print s+0}'; }
+
+# ask "<title>" <KiB> "<detail>" -> 0 if we should clean it
+ask() {
+    local title=$1 kib=$2 detail=${3:-}
+    printf '\n%s%s%s  %s\n' "$b" "$title" "$rst" "$(human "$kib")"
+    [ -n "$detail" ] && printf '%s%s%s\n' "$dim" "$detail" "$rst"
+    if [ "$kib" -eq 0 ] && [ "$title" != "Unused packages (orphans)" ]; then
+        echo "  nothing to clean"; return 1
+    fi
+    [ $DRY -eq 1 ] && return 1
+    [ $YES -eq 1 ] && return 0
+    read -r -p "  Clean it? [y/N] " a; [[ $a == [yY]* ]]
+}
+done_() { freed=$(( freed + $1 )); printf '  %scleaned%s\n' "$grn" "$rst"; }
+
+# 1. Old package downloads (keep the newest copy of each installed package)
+if command -v paccache >/dev/null; then
+    kib=$(paccache -dk1 2>/dev/null | awk '/disk space saved/ {gsub(/[()]/,""); v=$(NF-1); u=$NF;
+          m=(u=="GiB")?v*1048576:(u=="MiB")?v*1024:(u=="KiB")?v:v/1024; print int(m)}')
+    kib2=$(paccache -duk0 2>/dev/null | awk '/disk space saved/ {gsub(/[()]/,""); v=$(NF-1); u=$NF;
+          m=(u=="GiB")?v*1048576:(u=="MiB")?v*1024:(u=="KiB")?v:v/1024; print int(m)}')
+    total=$(( ${kib:-0} + ${kib2:-0} ))
+    if ask "Old package downloads" "$total" "  /var/cache/pacman/pkg: older versions, and packages you've uninstalled"; then
+        sudo paccache -qrk1; sudo paccache -qruk0; done_ "$total"
+    fi
+fi
+
+# 2. Packages nothing needs anymore
+mapfile -t orphans < <(pacman -Qdtq 2>/dev/null)
+if [ ${#orphans[@]} -gt 0 ]; then
+    kib=$(pacman -Qi "${orphans[@]}" 2>/dev/null | awk -F': ' '/^Installed Size/ {split($2,a," "); v=a[1]; gsub(",",".",v);
+          print int((a[2]=="GiB")?v*1048576:(a[2]=="MiB")?v*1024:(a[2]=="KiB")?v:v/1024)}' | awk '{s+=$1} END{print s+0}')
+    if ask "Unused packages (orphans)" "$kib" "  ${orphans[*]}"; then
+        sudo pacman -Rns --noconfirm "${orphans[@]}" && done_ "$kib"
+    fi
+else
+    printf '\n%sUnused packages (orphans)%s\n  nothing to clean\n' "$b" "$rst"
+fi
+
+# 3. yay build files
+kib=$(size_of ~/.cache/yay)
+if ask "yay build files" "$kib" "  ~/.cache/yay: sources downloaded to build AUR packages"; then
+    rm -rf ~/.cache/yay/* && done_ "$kib"
+fi
+
+# 4. Trash
+kib=$(size_of ~/.local/share/Trash/files ~/.local/share/Trash/info)
+if ask "Trash" "$kib" "  ~/.local/share/Trash: files you deleted in Thunar"; then
+    rm -rf ~/.local/share/Trash/files/* ~/.local/share/Trash/info/* && done_ "$kib"
+fi
+
+# 5. Thumbnails
+kib=$(size_of ~/.cache/thumbnails)
+if ask "Image thumbnails" "$kib" "  ~/.cache/thumbnails: rebuilt automatically when needed"; then
+    rm -rf ~/.cache/thumbnails/* && done_ "$kib"
+fi
+
+# 6. Firefox cache (only while Firefox is closed)
+kib=$(size_of ~/.cache/mozilla)
+if pgrep -x firefox >/dev/null; then
+    printf '\n%sFirefox cache%s  %s\n  %sskipped: close Firefox first%s\n' "$b" "$rst" "$(human "$kib")" "$dim" "$rst"
+elif ask "Firefox cache" "$kib" "  ~/.cache/mozilla: cached web pages and videos (logins and history are kept)"; then
+    rm -rf ~/.cache/mozilla/* && done_ "$kib"
+fi
+
+# 7. System logs older than 2 weeks
+kib=$(du -sk /var/log/journal 2>/dev/null | awk '{print $1}'); kib=${kib:-0}
+if ask "System logs" "$kib" "  /var/log/journal: removes entries older than 2 weeks (this is the whole size)"; then
+    before=$kib
+    sudo journalctl -q --vacuum-time=2weeks
+    after=$(du -sk /var/log/journal 2>/dev/null | awk '{print $1}')
+    done_ $(( before - ${after:-before} ))
+fi
+
+# 8. Crash dumps
+kib=$(size_of /var/lib/systemd/coredump)
+if ask "Crash dumps" "$kib" "  /var/lib/systemd/coredump: memory dumps from apps that crashed"; then
+    sudo find /var/lib/systemd/coredump -mindepth 1 -delete && done_ "$kib"
+fi
+
+# 9. Config backups made by ~/dotfiles/install.sh
+mapfile -t baks < <(find "$HOME" -maxdepth 5 -name '*.bak-[0-9]*' -not -path "$HOME/dotfiles/*" 2>/dev/null)
+kib=0; [ ${#baks[@]} -gt 0 ] && kib=$(size_of "${baks[@]}")
+if ask "Old config backups" "$kib" "  ${#baks[@]} *.bak-<date> files left by install.sh"; then
+    rm -f -- "${baks[@]}" && done_ "$kib"
+fi
+
+echo
+if [ $DRY -eq 1 ]; then
+    echo "${b}Dry run:${rst} nothing was changed. Run ${b}sweep${rst} to clean."
+else
+    echo "${b}Freed about $(human "$freed").${rst}"
+fi
