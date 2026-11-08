@@ -9,6 +9,7 @@ picom
 dunst
 libnotify
 feh
+waypaper
 xob
 dex
 polkit-gnome
