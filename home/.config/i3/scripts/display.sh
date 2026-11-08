@@ -57,6 +57,7 @@ watch() {
 
     layout
     last=$(cat "$HDMI_STATUS" 2>/dev/null)
+    last_screens=$(xrandr --listactivemonitors)
 
     # Wake up on any i3 output change (arandr, xrandr) or cable hotplug
     { i3-msg -t subscribe -m '["output"]' & udevadm monitor --udev --subsystem-match=drm & wait; } |
@@ -68,6 +69,13 @@ watch() {
             layout
         fi
         fix
+        # Screens added, removed or moved: redraw wallpaper and bars to match
+        screens=$(xrandr --listactivemonitors)
+        if [ "$screens" != "$last_screens" ]; then
+            last_screens=$screens
+            feh --no-fehbg --bg-fill ~/.config/i3/wallpaper.png
+            ~/.config/polybar/launch.sh >/dev/null 2>&1 &
+        fi
     done
 }
 
