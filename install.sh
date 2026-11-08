@@ -71,6 +71,11 @@ system_settings() {
         sudo systemctl restart systemd-resolved
         echo "   set DNS to Cloudflare/Google over TLS"
     fi
+    # Mouse speed/acceleration like Windows' default
+    if ! cmp -s "$DOTFILES/system/30-mouse.conf" /etc/X11/xorg.conf.d/30-mouse.conf; then
+        sudo install -Dm644 "$DOTFILES/system/30-mouse.conf" /etc/X11/xorg.conf.d/30-mouse.conf
+        echo "   set mouse to Windows-like default (applies after next login)"
+    fi
     # NVIDIA sleep/wake support
     if command -v nvidia-smi >/dev/null; then
         sudo systemctl enable nvidia-suspend nvidia-resume nvidia-hibernate

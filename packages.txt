@@ -15,6 +15,7 @@ polkit-gnome
 redshift
 xorg-xrdb
 xorg-xrandr
+xorg-xinput
 alacritty
 
 # Look
