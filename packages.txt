@@ -48,8 +48,6 @@ networkmanager
 vulkan-tools
 gamemode
 lib32-gamemode
-steam
-gamescope
 
 # Misc
 python
