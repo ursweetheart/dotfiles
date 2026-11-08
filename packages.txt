@@ -47,6 +47,7 @@ networkmanager
 vulkan-tools
 gamemode
 lib32-gamemode
+steam
 
 # Misc
 python
