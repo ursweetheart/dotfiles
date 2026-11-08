@@ -1,0 +1,53 @@
+# Packages from the official / CachyOS repos (installed with pacman)
+
+# Desktop
+i3-wm
+i3lock-color
+polybar
+rofi
+picom
+dunst
+libnotify
+feh
+xob
+dex
+polkit-gnome
+redshift
+xorg-xrdb
+xorg-xrandr
+alacritty
+
+# Look
+ttf-meslo-nerd
+capitaine-cursors
+
+# Vietnamese typing
+fcitx5
+fcitx5-unikey
+fcitx5-configtool
+fcitx5-gtk
+fcitx5-qt
+
+# Screenshots (clipboard only)
+maim
+xclip
+xdotool
+
+# Screens, sound, Fn keys
+arandr
+pavucontrol
+pamixer
+brightnessctl
+playerctl
+
+# Network
+networkmanager
+
+# Gaming (NVIDIA hybrid laptop)
+vulkan-tools
+gamemode
+lib32-gamemode
+
+# Misc
+python
+gnome-calculator

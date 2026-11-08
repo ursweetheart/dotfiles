@@ -1,0 +1,7 @@
+# Packages installed with yay (AUR, or the CachyOS repo when available)
+
+# Discord client with Vencord
+vesktop-bin
+
+# Keyboard backlight / Fn keys on Clevo-based laptops (Gigabyte G5)
+tuxedo-drivers-dkms
