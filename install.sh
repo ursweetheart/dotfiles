@@ -4,6 +4,7 @@
 #   ./install.sh                  packages + configs + system settings
 #   ./install.sh --configs-only   only link the config files
 #   ./install.sh --packages-only  only install packages
+#   ./install.sh --system-only    only system settings (typing, DNS, mouse, NVIDIA)
 #
 # Config files are symlinked from ./home into your home folder, so editing
 # ~/.config/... edits this repo too. Any existing file is moved aside to
@@ -85,8 +86,9 @@ system_settings() {
 case "${1:-}" in
     --configs-only)  link_configs ;;
     --packages-only) install_packages ;;
+    --system-only)   system_settings ;;
     "")              install_packages; link_configs; system_settings ;;
-    *) echo "usage: $0 [--configs-only | --packages-only]"; exit 1 ;;
+    *) echo "usage: $0 [--configs-only | --packages-only | --system-only]"; exit 1 ;;
 esac
 
 say "Done. Log out and back in (or press Win+Shift+R) to load everything."
