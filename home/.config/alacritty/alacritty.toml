@@ -65,7 +65,7 @@ thickness = 0.15
 [mouse]
 hide_when_typing = true
 bindings = [
-{ mouse = "Middle", mods = "None", command = { program = "/usr/bin/fcitx5-remote", args = ["-t"] } },
+{ mouse = "Middle", mods = "None", action = "PasteSelection" },
 ]
 
 [keyboard]
