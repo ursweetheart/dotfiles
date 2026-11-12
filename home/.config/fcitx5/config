@@ -3,12 +3,9 @@
 EnumerateWithTriggerKeys=True
 EnumerateSkipFirst=False
 
-# Ctrl+Shift toggles English <-> Vietnamese (like Unikey on Windows)
+# Ctrl+Space toggles English <-> Vietnamese
 [Hotkey/TriggerKeys]
-0=Control+Shift_L
-1=Shift+Control_L
-2=Control+Shift_R
-3=Shift+Control_R
+0=Control+space
 
 # Disable defaults that would clash: tapping Left Shift alone,
 # and Super+Space (used by i3 for focus mode_toggle)
