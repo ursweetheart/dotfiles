@@ -70,7 +70,7 @@ font-4 = FontAwesome5Brands:style=Solid:pixelsize=10;3
 modules-left = i3 info-hackspeed
 modules-right = cpu memory temperature network-wired network-wifi pulseaudio battery updates date
 
-tray-position = right
+tray-position = ${env:TRAY_POSITION:none}
 tray-padding = 0
 tray-detached = false
 tray-maxsize = 18

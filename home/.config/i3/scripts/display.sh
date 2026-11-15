@@ -7,7 +7,8 @@
 #   display.sh fix      raise every active screen to its max refresh rate now
 #
 # Default layout:
-#   HDMI plugged in -> HDMI-1 only, primary   (laptop screen off)
+#   HDMI plugged in -> laptop screen (eDP-1) primary on the left,
+#                      HDMI-1 to its right
 #   HDMI unplugged  -> laptop screen (eDP-1)
 # Change the layout any time with arandr; this script only bumps the refresh
 # rate back up and won't undo your layout, except when the cable is plugged
@@ -21,8 +22,8 @@ hdmi_connected() { [ "$(cat "$HDMI_STATUS" 2>/dev/null)" = connected ]; }
 
 layout() {
     if hdmi_connected; then
-        xrandr --output "$EXTERNAL" --mode 1920x1080 --rate 144 --primary --pos 0x0 \
-               --output "$LAPTOP" --off
+        xrandr --output "$LAPTOP" --mode 1920x1080 --rate 144 --primary --pos 0x0 \
+               --output "$EXTERNAL" --mode 1920x1080 --rate 144 --pos 1920x0
     else
         xrandr --output "$LAPTOP" --mode 1920x1080 --rate 144 --primary --pos 0x0 \
                --output "$EXTERNAL" --off

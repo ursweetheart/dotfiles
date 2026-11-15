@@ -63,6 +63,11 @@ set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
 
+# Pin workspace 1 to the primary screen (the laptop panel) and workspace 2 to
+# the HDMI monitor when it is plugged in, falling back to the primary.
+workspace $ws1 output primary
+workspace $ws2 output HDMI-1 primary
+
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
 bindsym $mod+2 workspace number $ws2
@@ -178,6 +183,8 @@ bindsym $mod+Shift+p exec --no-startup-id gnome-calculator
 ## Previous / next workspace
 bindsym $mod+Prior workspace prev
 bindsym $mod+Next workspace next
+bindsym $mod+Shift+Prior move container to workspace prev
+bindsym $mod+Shift+Next move container to workspace next
 
 ## Fn keys: brightness (shows the level on the xob bar)
 bindsym XF86MonBrightnessUp exec --no-startup-id ~/.config/i3/scripts/brightness.sh up
@@ -236,6 +243,7 @@ exec --no-startup-id redshift
 exec --no-startup-id dex -a -s /etc/xdg/autostart/:~/.config/autostart/
 exec --no-startup-id fcitx5 -d
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec_always --no-startup-id autotiling
 
 exec_always --no-startup-id mkfifo /tmp/xobpipe && tail -f /tmp/xobpipe | xob -t 2170 & disown
 #exec ~/.i3/launch.sh

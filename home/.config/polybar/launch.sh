@@ -14,8 +14,12 @@ done
 
 # for multimonitor
 if type "xrandr"; then
-  for m in $(xrandr --listactivemonitors | awk 'NR>1 {print $NF}'); do
-    MONITOR=$m polybar --reload example & disown
+  monitors=$(xrandr --listactivemonitors | awk 'NR>1 {print $NF}')
+  # Only one bar can own the X11 tray: prefer HDMI-1, else the first monitor
+  tray_mon=$(echo "$monitors" | grep -x HDMI-1 || echo "$monitors" | head -n1)
+  for m in $monitors; do
+    if [ "$m" = "$tray_mon" ]; then tp=right; else tp=none; fi
+    MONITOR=$m TRAY_POSITION=$tp polybar --reload example & disown
   done
 else
   polybar --reload example & disown
